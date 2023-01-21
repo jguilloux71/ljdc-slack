@@ -83,5 +83,5 @@ def send_img_to_channel(post):
         logger.error('Slack: unable to send GIF image to channel [%s]: ' % (SLACK_CHANNEL, str(e.response['error'])))
         sys.exit(1)
 
-    logger.info('Slack: new message/img posted successfully!')
+    logger.info('Slack: new message/img posted successfully [id=%s]' % (post['id']))
 #-------------------------------------------------------------------------------------------------------------

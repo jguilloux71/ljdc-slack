@@ -13,6 +13,7 @@ from logger import logger
 #-------------------------------------------------------------------------------------------------------------
 LJDC_LAST_POST_ID_FILE = '/var/tmp/ljdc/.ljdc_last_post_id'
 LJDC_RSS_URL           = 'https://lesjoiesducode.fr/feed'
+LJDC_MAX_POST_IDS      = 5
 #-------------------------------------------------------------------------------------------------------------
 
 
@@ -23,6 +24,7 @@ def _get_gif_img_from_post(post):
     post_img = None
     
     for link in post.links:
+        logger.info(link)
 
         # Check key 'type' exists in the dict 'link'
         if 'type' in link:
@@ -42,61 +44,88 @@ def _get_gif_img_from_post(post):
 
 
 #-------------------------------------------------------------------------------------------------------------
-def post_already_published(post):
-    logger.info('Last post id file: ' + LJDC_LAST_POST_ID_FILE)
-    last_post_id = None
+# This list is stored in the file: LJDC_LAST_POST_ID_FILE
+#-------------------------------------------------------------------------------------------------------------
+def get_post_ids_already_published():
+    logger.info('Last post ids file: ' + LJDC_LAST_POST_ID_FILE)
+    last_post_ids = []
 
     try:
         with open(LJDC_LAST_POST_ID_FILE, 'r') as f:
-            last_post_id = f.read().strip()
+            for line in (f.readlines()[:LJDC_MAX_POST_IDS]):
+                last_post_ids.append(line.strip())
     except FileNotFoundError:
         logger.info(LJDC_LAST_POST_ID_FILE + ": File not yet created. Maybe it's the first execution of this script. Let's go on")
     except IOError as e:
         logger.error(str(e))
         sys.exit(1)
 
-    logger.info('Last post id: %s' % (last_post_id))
-    return last_post_id == post['id']
+    logger.info('Last post ids already published: %s' % (str(last_post_ids)[1:-1]))
+
+    return last_post_ids
 #-------------------------------------------------------------------------------------------------------------
 
 
 
 
 #-------------------------------------------------------------------------------------------------------------
-def save_post_id_in_file(post):
+def save_post_ids_in_file(posts):
     try:
         with open(LJDC_LAST_POST_ID_FILE, "w") as f:
-            f.write(post['id'])
+            for post in posts:
+                f.write(post['id'] + '\n')
     except IOError as e:
         logger.error(str(e))
         sys.exit(1)
 
-    logger.info("New id [%s] in file [%s] saved" %(post['id'], LJDC_LAST_POST_ID_FILE))
+    logger.info("New ids in file [%s] saved" %(LJDC_LAST_POST_ID_FILE))
 #-------------------------------------------------------------------------------------------------------------
 
 
 
 
 #-------------------------------------------------------------------------------------------------------------
-def get_last_post():
-    post = {}
-    logger.info("URL to parse: " + LJDC_RSS_URL)
-
-    news_feed = feedparser.parse(LJDC_RSS_URL)
-    last_post = news_feed.entries[0]
-    
-    # ID format from URL: https://lesjoiesducode.fr/?p=25706
-    post['id']    = last_post.id.strip().split('=')[1]
-    post['title'] = last_post.title.strip()
-    post['img']   = _get_gif_img_from_post(last_post)
-    
-    if post['img'] is None:
-        logger.error('Unable to retrieve GIF image from the last post')
-        sys.exit(1)
-
+def _display_post_info(post):
     # Display info about the last post in logger file
-    for i in post.items():
-        logger.info(i)
+    for item in post.items():
+        logger.info(item)
+#-------------------------------------------------------------------------------------------------------------
+
+
+
+
+#-------------------------------------------------------------------------------------------------------------
+def _get_post(entry):
+    post = {}
+
+    # ID format from URL: https://lesjoiesducode.fr/?p=25706
+    post['id']    = entry.id.strip().split('=')[1]
+    post['title'] = entry.title.strip()
+    post['img']   = _get_gif_img_from_post(entry)
+
+    _display_post_info(post)
 
     return post
+#-------------------------------------------------------------------------------------------------------------
+
+
+
+
+#-------------------------------------------------------------------------------------------------------------
+def get_last_posts():
+    posts = []
+    logger.info("URL to parse: " + LJDC_RSS_URL)
+    news_feed = feedparser.parse(LJDC_RSS_URL)
+
+    for i in range(LJDC_MAX_POST_IDS):
+        logger.info('RSS entry number: %d' % (i))
+        post = _get_post(news_feed.entries[i])
+
+        if post['img'] is None:
+            logger.error('Unable to retrieve GIF image from the post: %s' % (post['id']))
+        else:
+            posts.append(post)
+            logger.info('Post added for treatment: %s' % (post['id']))
+
+    return posts
 #-------------------------------------------------------------------------------------------------------------

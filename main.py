@@ -28,31 +28,33 @@ logger.info("Let's get started")
 
 
 #-------------------------------------------------------------------------------------------------------------
+# Get the list of post IDs already published
+#-------------------------------------------------------------------------------------------------------------
+post_ids_already_published = ljdc.get_post_ids_already_published()
+
+
+#-------------------------------------------------------------------------------------------------------------
 # "Les joies du Code" information
 #-------------------------------------------------------------------------------------------------------------
-last_post = ljdc.get_last_post()
+last_posts = ljdc.get_last_posts()
 
-if ljdc.post_already_published(last_post):
-    logger.info("This post has already been published. Nothing to do")
-    sys.exit(0)
+for post in last_posts:
+    if post['id'] in post_ids_already_published:
+        logger.info("This post has already been published. Nothing to do [id=%s]" % (post['id']))
+    else:
+        slack.send_img_to_channel(post)
 #-------------------------------------------------------------------------------------------------------------
 
 
 
 
-#-------------------------------------------------------------------------------------------------------------
-# Send new 'LJDC' post to the dedicated Slack channel
-#-------------------------------------------------------------------------------------------------------------
-slack.send_img_to_channel(last_post)
-#-------------------------------------------------------------------------------------------------------------
-
-
 
 
 #-------------------------------------------------------------------------------------------------------------
-# Save new ID in file to avoid to publish a post already published
+# Save new IDs in file to avoid to publish these posts already published
+# for the next time
 #-------------------------------------------------------------------------------------------------------------
-ljdc.save_post_id_in_file(last_post)
+ljdc.save_post_ids_in_file(last_posts)
 #-------------------------------------------------------------------------------------------------------------
 
 
