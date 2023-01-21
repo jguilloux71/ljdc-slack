@@ -60,7 +60,7 @@ def get_post_ids_already_published():
         logger.error(str(e))
         sys.exit(1)
 
-    logger.info('Last post ids already published: %s' % (str(last_post_ids)[1:-1]))
+    logger.info('List of last post ids already published: %s' % (str(last_post_ids)[1:-1]))
 
     return last_post_ids
 #-------------------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ def save_post_ids_in_file(posts):
         logger.error(str(e))
         sys.exit(1)
 
-    logger.info("New ids in file [%s] saved" %(LJDC_LAST_POST_ID_FILE))
+    logger.info("New list of post ids written successfully in file: %s" %(LJDC_LAST_POST_ID_FILE))
 #-------------------------------------------------------------------------------------------------------------
 
 
@@ -122,10 +122,10 @@ def get_last_posts():
         post = _get_post(news_feed.entries[i])
 
         if post['img'] is None:
-            logger.error('Unable to retrieve GIF image from the post: %s' % (post['id']))
+            logger.error('Unable to retrieve GIF image [id=%s]' % (post['id']))
         else:
             posts.append(post)
-            logger.info('Post added for treatment: %s' % (post['id']))
+            logger.info('Post added for treatment [id=%s]' % (post['id']))
 
     return posts
 #-------------------------------------------------------------------------------------------------------------

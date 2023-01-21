@@ -20,7 +20,7 @@ def _initialize():
     # Create and configure logger
     logging.basicConfig(
         filename = LJDC_LOG_FILE,
-        format   = '%(asctime)s %(message)s',
+        format   = '%(asctime)s [%(module)s] %(message)s',
         filemode = 'a'  # append
     )
  
