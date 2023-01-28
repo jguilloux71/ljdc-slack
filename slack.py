@@ -71,7 +71,8 @@ class Slack:
         try:
             self.client.chat_postMessage(
                 channel     = self.channel,
-                text        = '_' + post['author-date'] + '_',
+                # Slack markdown syntax for HTML link: <http://www.example.com|This message *is* a link>
+                text        = '<' + post['url'] + '|_' + post['author-date'] + '_>',
                 attachments = attachments
         )
         except SlackApiError as e:
