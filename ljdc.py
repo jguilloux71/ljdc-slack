@@ -1,6 +1,7 @@
 #------------------------------------------------------------------------------
 # Import Python libraries
-import feedparser
+from bs4 import BeautifulSoup
+import requests
 import sys
 
 # Import Custom libraries
@@ -12,32 +13,8 @@ from logger import logger
 
 #------------------------------------------------------------------------------
 LJDC_LAST_POST_ID_FILE = '/var/tmp/ljdc/.ljdc_last_post_id'
-LJDC_RSS_URL           = 'https://lesjoiesducode.fr/feed'
+LJDC_URL               = 'https://lesjoiesducode.fr/'
 LJDC_MAX_POST_IDS      = 5
-#------------------------------------------------------------------------------
-
-
-
-
-#------------------------------------------------------------------------------
-def _get_gif_img_from_post(post):
-    post_img = None
-    
-    for link in post.links:
-        logger.info(link)
-
-        # Check key 'type' exists in the dict 'link'
-        if 'type' in link:
-
-            # Dict returned:
-            # {'length': '0', 'type': 'video/webm', 'href': 'https://lesjoiesducode.fr/content/036/r3HSp6n.webm', 'rel': 'enclosure'}
-            if link.type == 'video/webm' or link.type == 'video/mp4':
-
-                # Replace extension by '.gif'
-                post_img = link.href.rsplit('.', 1)[0] + '.gif'
-                break
-
-    return post_img
 #------------------------------------------------------------------------------
 
 
@@ -81,7 +58,7 @@ def save_post_ids_in_file(posts):
         sys.exit(1)
 
     logger.info("New list of post ids written successfully in file: %s" %
-        LJDC_LAST_POST_ID_FILE))
+        (LJDC_LAST_POST_ID_FILE))
 #------------------------------------------------------------------------------
 
 
@@ -98,13 +75,26 @@ def _display_post_info(post):
 
 
 #------------------------------------------------------------------------------
+def _get_post_id(img_url):
+    """
+    URL format: https://lesjoiesducode.fr/content/048/hZYLfUl.gif
+    return: hZYLfUl
+    """
+    return img_url.rsplit('/', 1)[1].split('.')[0]
+#------------------------------------------------------------------------------
+
+
+
+
+#------------------------------------------------------------------------------
 def _get_post(entry):
     post = {}
 
-    # ID format from URL: https://lesjoiesducode.fr/?p=25706
-    post['id']    = entry.id.strip().split('=')[1]
-    post['title'] = entry.title.strip()
-    post['img']   = _get_gif_img_from_post(entry)
+    post['url']         = entry.find('h1',   class_='index-blog-post-title').find('a').get('href')
+    post['title']       = entry.find('h1',   class_='index-blog-post-title').find('a').get_text()
+    post['author-date'] = entry.find('div',  class_='post-meta-info').get_text().strip()
+    post['img']         = entry.find('div',  class_='blog-post-content').find('video').find('object').get('data')
+    post['id']          = _get_post_id(post['img'])
 
     _display_post_info(post)
 
@@ -117,15 +107,20 @@ def _get_post(entry):
 #------------------------------------------------------------------------------
 def get_last_posts():
     posts = []
-    logger.info("URL to parse: " + LJDC_RSS_URL)
-    news_feed = feedparser.parse(LJDC_RSS_URL)
+    logger.info("URL to parse: " + LJDC_URL)
 
-    for i in range(LJDC_MAX_POST_IDS):
-        logger.info('RSS entry number: %d' % (i))
-        post = _get_post(news_feed.entries[i])
+    page = requests.get(LJDC_URL)
+    soup = BeautifulSoup(page.content, "html.parser")
+
+    # In LJDC website, a post = an article
+    articles = soup.find_all("article", class_="blog-post")
+
+    for article in articles:
+        logger.info('- New post found -')
+        post = _get_post(article)
 
         if post['img'] is None:
-            logger.error('Unable to retrieve GIF image [id=%s]' % (post['id']))
+            logger.error('Unable to retrieve img for post: %s' % (post['url']))
         else:
             posts.append(post)
             logger.info('Post added for treatment [id=%s]' % (post['id']))

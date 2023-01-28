@@ -71,7 +71,7 @@ class Slack:
         try:
             self.client.chat_postMessage(
                 channel     = self.channel,
-                text        = '_' + self._get_img_text() + '_',
+                text        = '_' + post['author-date'] + '_',
                 attachments = attachments
         )
         except SlackApiError as e:
@@ -81,12 +81,6 @@ class Slack:
 
         logger.info('[%s] New message/img posted successfully [id=%s]' %
             (self.channel, post['id']))
-
-
-    def _get_img_text(self):
-        # Get date of day at format: '03 Fev 2023'
-        date_today = datetime.date.today().strftime("%d %b %Y")
-        return 'Les joies du code, commit du ' + date_today
 
 
     def print_env(self):
