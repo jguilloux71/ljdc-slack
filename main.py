@@ -49,9 +49,14 @@ post_ids_already_published = ljdc.get_post_ids_already_published()
 
 
 #------------------------------------------------------------------------------
-# "Les joies du Code" information
+# Get the last post from "Les joies du Code" website and send GIF img
+# (and only GIF, not JPG or another format) to Slack channelo
 #------------------------------------------------------------------------------
-last_posts = ljdc.get_last_posts()
+try:
+    last_posts = ljdc.get_last_posts()
+except Exception as e:
+    logger.error('Error: %s' % (str(e)))
+    sys.exit(1)
 
 for post in last_posts:
     if post['id'] in post_ids_already_published:

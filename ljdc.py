@@ -90,11 +90,19 @@ def _get_post_id(img_url):
 def _get_post(entry):
     post = {}
 
+    logger.info('1')
     post['url']         = entry.find('h1',   class_='index-blog-post-title').find('a').get('href')
+    logger.info('2')
     post['title']       = entry.find('h1',   class_='index-blog-post-title').find('a').get_text()
+    logger.info('3')
     post['author-date'] = entry.find('div',  class_='post-meta-info').get_text().strip()
-    post['img']         = entry.find('div',  class_='blog-post-content').find('video').find('object').get('data')
-    post['id']          = _get_post_id(post['img'])
+    logger.info('4')
+
+    try:
+        post['img']     = entry.find('div',  class_='blog-post-content').find('video').find('object').get('data')
+        post['id']      = _get_post_id(post['img'])
+    except:
+        post['img']     = None
 
     _display_post_info(post)
 
@@ -110,6 +118,7 @@ def get_last_posts():
     logger.info("URL to parse: " + LJDC_URL)
 
     page = requests.get(LJDC_URL)
+
     soup = BeautifulSoup(page.content, "html.parser")
 
     # In LJDC website, a post = an article
