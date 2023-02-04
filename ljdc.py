@@ -87,22 +87,36 @@ def _get_post_id(img_url):
 
 
 #------------------------------------------------------------------------------
+def _get_post_img(entry):
+    # Try to find a GIF (<video>)
+    try:
+        post_img = entry.find('div',  class_='blog-post-content').find('video').find('object').get('data')
+        post_id  = _get_post_id(post_img)
+    except:
+
+        # Try to find a static JPG (<img>)
+        try:
+            post_img = entry.find('div',  class_='blog-post-content').find('img').get('data-src')
+            post_id  = _get_post_id(post_img)
+        except:
+            post_img = None
+            post_id  = None
+
+    return (post_img, post_id)
+#------------------------------------------------------------------------------
+
+
+
+
+#------------------------------------------------------------------------------
 def _get_post(entry):
     post = {}
 
-    logger.info('1')
     post['url']         = entry.find('h1',   class_='index-blog-post-title').find('a').get('href')
-    logger.info('2')
     post['title']       = entry.find('h1',   class_='index-blog-post-title').find('a').get_text()
-    logger.info('3')
     post['author-date'] = entry.find('div',  class_='post-meta-info').get_text().strip()
-    logger.info('4')
 
-    try:
-        post['img']     = entry.find('div',  class_='blog-post-content').find('video').find('object').get('data')
-        post['id']      = _get_post_id(post['img'])
-    except:
-        post['img']     = None
+    (post['img'], post['id']) = _get_post_img(entry)
 
     _display_post_info(post)
 

@@ -50,13 +50,13 @@ class Slack:
         client = WebClient(
             token = self.auth_token
         )
-    
+
         try:
             client.auth_test()
         except SlackApiError as e:
             logger.error('Slack API test error: ' + str(e.response['error']))
             raise e
-        
+
         return client
 
 
@@ -87,3 +87,4 @@ class Slack:
     def print_env(self):
         print (self.auth_token)
         print (self.channel)
+#------------------------------------------------------------------------------
