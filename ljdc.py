@@ -1,11 +1,11 @@
 #------------------------------------------------------------------------------
 # Import Python libraries
 from bs4 import BeautifulSoup
-import requests
 import sys
 
 # Import Custom libraries
 from logger import logger
+import tools
 #------------------------------------------------------------------------------
 
 
@@ -129,9 +129,10 @@ def _get_post(entry):
 #------------------------------------------------------------------------------
 def get_last_posts():
     posts = []
-    logger.info("URL to parse: " + LJDC_URL)
 
-    page = requests.get(LJDC_URL)
+    page = tools.get_request(LJDC_URL)
+    if page is None:
+        sys.exit(1)
 
     soup = BeautifulSoup(page.content, "html.parser")
 
