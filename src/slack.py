@@ -22,7 +22,7 @@ SLACK_ENV_AUTH_TOKEN = 'SLACK_BOT_TOKEN'
 
 
 #------------------------------------------------------------------------------
-class SlackGetEnvError(Exception): 
+class SlackGetEnvError(Exception):
     pass
 #------------------------------------------------------------------------------
 

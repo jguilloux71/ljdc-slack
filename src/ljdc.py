@@ -50,9 +50,10 @@ def get_post_ids_already_published():
 #------------------------------------------------------------------------------
 def save_post_ids_in_file(posts):
     try:
-        with open(LJDC_LAST_POST_ID_FILE, "w") as f:
+        with open(LJDC_LAST_POST_ID_FILE, 'w') as f:
             for post in posts:
                 f.write(post['id'] + '\n')
+                logger.info('ID written: %s' % (post['id']))
     except IOError as e:
         logger.error(str(e))
         sys.exit(1)
