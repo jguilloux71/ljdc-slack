@@ -36,10 +36,10 @@ def get_request(url):
 
     logger.info('URL to fecth: %s' % (url))
     try:
-        page = requests.get(url, headers=headers)
+        content = requests.get(url, headers=headers)
     except requests.exceptions.RequestException as e:
         logger.error(str(e))
-        page = None
+        content = None
 
-    return page
+    return content
 #------------------------------------------------------------------------------
