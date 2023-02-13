@@ -12,6 +12,9 @@ import unittest
 
 # let's use the pprint module for readability
 from pprint import pprint
+from slack_sdk import web
+from slack_sdk.errors import SlackApiError
+
 
 # import inspect module
 import inspect
@@ -47,7 +50,11 @@ class TestTools(unittest.TestCase):
         channel = tools.get_env(self.fake_env)
         self.assertEqual(channel, self.fake_chan)
 
-    def test_get_request_error(self):
+    @patch('requests.get')
+    def test_get_request_error(self, m):
+        m.side_effect = requests.exceptions.RequestException(
+            'HTTP connection error, unable to reach: %s' % (self.fake_url)
+        )
         response = tools.get_request(self.fake_url)
         self.assertIsNone(response)
 
@@ -114,28 +121,29 @@ class TestLjdc(unittest.TestCase):
 
     def test_get_post_gif(self):
         post = ljdc._get_post(self.article_gif)
-        self.assertEqual(post['url'], 'https://my-fake.url')
-        self.assertEqual(post['title'], 'My fake title')
-        self.assertEqual(post['author-date'], 'My fake author, my fake date')
-        self.assertEqual(post['img'], 'https://my-fake/img/my-fake-id.gif')
-        self.assertEqual(post['id'], 'my-fake-id')
+        self.assertEqual(post['url'], 'https://my-fake-GIF.url')
+        self.assertEqual(post['title'], 'My fake title GIF')
+        self.assertEqual(post['author-date'], 'My fake author GIF, my fake date GIF')
+        self.assertEqual(post['img'], 'https://my-fake/img/my-fake-id-GIF.gif')
+        self.assertEqual(post['id'], 'my-fake-id-GIF')
 
     def test_get_post_jpg(self):
         post = ljdc._get_post(self.article_jpg)
-        self.assertEqual(post['url'], 'https://my-fake.url')
-        self.assertEqual(post['title'], 'My fake title')
-        self.assertEqual(post['author-date'], 'My fake author, my fake date')
-        self.assertEqual(post['img'], 'https://my-fake/img/my-fake-id.jpg')
-        self.assertEqual(post['id'], 'my-fake-id')
+        self.assertEqual(post['url'], 'https://my-fake-JPG.url')
+        self.assertEqual(post['title'], 'My fake title JPG')
+        self.assertEqual(post['author-date'], 'My fake author JPG, my fake date JPG')
+        self.assertEqual(post['img'], 'https://my-fake/img/my-fake-id-JPG.jpg')
+        self.assertEqual(post['id'], 'my-fake-id-JPG')
 
-    @requests_mock.Mocker()
+    @patch('requests.get')
     def test_get_last_posts(self, m):
         # Mock GET request with fake data
-        m.get(ljdc.LJDC_URL, text=self.article_gif_data+self.article_jpg_data)
+        m.return_value.ok = True
+        m.return_value.content = self.article_gif_data+self.article_jpg_data
         last_posts = ljdc.get_last_posts()
         self.assertEqual(len(last_posts), 2)
-        self.assertEqual(last_posts[0]['img'], 'https://my-fake/img/my-fake-id.gif')
-        self.assertEqual(last_posts[1]['img'], 'https://my-fake/img/my-fake-id.jpg')
+        self.assertEqual(last_posts[0]['img'], 'https://my-fake/img/my-fake-id-GIF.gif')
+        self.assertEqual(last_posts[1]['img'], 'https://my-fake/img/my-fake-id-JPG.jpg')
 
     @patch('ljdc.LJDC_LAST_POST_ID_FILE', '/var/tmp/ll')
     def test_ids_file_does_not_exist(self):
@@ -180,11 +188,19 @@ from slack_sdk.errors import SlackApiError
 
 class TestSlack(unittest.TestCase):
 
-    """ This test allows to verify there is weel an exception
+    fake_post ={
+        'id' : 'fake-id',
+        'img' : 'https://fake.img',
+        'title' : 'Fake title',
+        'url' : 'https://fake.url',
+        'author-date' : 'fake date'
+    }
+    
+    """ This test allows to verify there is well an exception
     when SLACK_BOT_TOKEN and SLACK_CHANNEL are not defined.
     To be sure to don't be impacted by these "real" env variables
     on your own environment, we mock SLACK_ENV_AUTH_TOKEN and 
-    SLACK_ENV_CHANNEL"""
+    SLACK_ENV_CHANNEL variables (Python variables)"""
     @patch('slack.SLACK_ENV_AUTH_TOKEN', 'FAKE_SLACK_BOT_TOKEN')
     @patch('slack.SLACK_ENV_CHANNEL',    'FAKE_SLACK_CHANNEL')
     def test_slack_no_env_var(self):
@@ -204,15 +220,40 @@ class TestSlack(unittest.TestCase):
     @patch('slack.SLACK_ENV_CHANNEL',    'FAKE_SLACK_CHANNEL')
     @mock.patch.dict(os.environ, {'FAKE_SLACK_BOT_TOKEN' : 'My fake token'})
     @mock.patch.dict(os.environ, {'FAKE_SLACK_CHANNEL'   : 'My fake channel'})
-    def test_slack_env_var_ok_but_bad_token(self):
+    @patch('slack_sdk.WebClient.auth_test')
+    def test_slack_env_var_ok_but_bad_token(self, mock_test):
+        resp = web.SlackResponse(client='', http_verb='', api_url='',
+            req_args={}, data={'ok': False, 'error': 'fake invalid error'}, headers={}, status_code=1)
+        mock_test.side_effect = SlackApiError('', resp)
         with self.assertRaises(SlackApiError) as context:
             slack.Slack()
 
-    # Mock POST request to Slack API
-    @requests_mock.Mocker()
-    def test_slack_ok(self, m):
+    @patch('slack.SLACK_ENV_AUTH_TOKEN', 'FAKE_SLACK_BOT_TOKEN')
+    @patch('slack.SLACK_ENV_CHANNEL',    'FAKE_SLACK_CHANNEL')
+    @mock.patch.dict(os.environ, {'FAKE_SLACK_BOT_TOKEN' : 'My fake token'})
+    @mock.patch.dict(os.environ, {'FAKE_SLACK_CHANNEL'   : 'My fake channel'})
+    @patch('slack_sdk.WebClient.auth_test')
+    @patch('slack_sdk.WebClient.chat_postMessage')
+    def test_slack_send_img_ok(self, c, a):
         my_slack = slack.Slack()
         self.assertIsNotNone(my_slack)
+        res = my_slack.send_img_to_channel(self.fake_post)
+        self.assertTrue(res)
+
+    @patch('slack.SLACK_ENV_AUTH_TOKEN', 'FAKE_SLACK_BOT_TOKEN')
+    @patch('slack.SLACK_ENV_CHANNEL',    'FAKE_SLACK_CHANNEL')
+    @mock.patch.dict(os.environ, {'FAKE_SLACK_BOT_TOKEN' : 'My fake token'})
+    @mock.patch.dict(os.environ, {'FAKE_SLACK_CHANNEL'   : 'My fake channel'})
+    @patch('slack_sdk.WebClient.auth_test')
+    @patch('slack_sdk.WebClient.chat_postMessage')
+    def test_slack_send_img_nok(self, mock_message, mock_test):
+        my_slack = slack.Slack()
+        self.assertIsNotNone(my_slack)
+        resp = web.SlackResponse(client='', http_verb='', api_url='',
+            req_args={}, data={'ok': False, 'error': 'fake message error'}, headers={}, status_code=1)
+        mock_message.side_effect = SlackApiError('', resp)
+        res = my_slack.send_img_to_channel(self.fake_post)
+        self.assertFalse(res)
 #------------------------------------------------------------------------------
 
 

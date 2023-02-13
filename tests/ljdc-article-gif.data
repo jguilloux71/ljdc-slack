@@ -1,13 +1,13 @@
 <article class="blog-post index-blog-post">
 	<h1 class="index-blog-post-title">
-		<a href="https://my-fake.url">My fake title</a>
+		<a href="https://my-fake-GIF.url">My fake title GIF</a>
 	</h1>
 
 	<div class="post-meta-info">
 		<svg class="octicon-svg" xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16">
 			<path fill-rule="evenodd" d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path>
 		</svg>
-		<span class="post-author">My fake author</span>, my fake date
+		<span class="post-author">My fake author GIF</span>, my fake date GIF
 	</div>
 
 	<div class="blog-post-content">
@@ -15,7 +15,7 @@
 		<video autoplay="" loop="" muted="" playsinline="">
 			<source src="https://lesjoiesducode.fr/content/048/byasPY7.webm" type="video/webm">
 			<source src="https://lesjoiesducode.fr/content/048/byasPY7.mp4" type="video/mp4">
-			<object data="https://my-fake/img/my-fake-id.gif" type="image/gif"></object>
+			<object data="https://my-fake/img/my-fake-id-GIF.gif" type="image/gif"></object>
 		</video></p></div><div class="social-share">
 		<a href="https://www.facebook.com/sharer/sharer.php?u=https://lesjoiesducode.fr/quand-mon-projet-est-toujours-casse-et-que-je-pars-discretement-en-week-end" class="js-social-share social-btn" target="_blank">
 			<button id="facebookSharingBtn" type="button" class="btn btn-default social-fb-btn">

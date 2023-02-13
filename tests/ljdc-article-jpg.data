@@ -1,6 +1,6 @@
 <article class="blog-post index-blog-post">
 	<h1 class="index-blog-post-title">
-		<a href="https://my-fake.url">My fake title</a>
+		<a href="https://my-fake-JPG.url">My fake title JPG</a>
 	</h1>
 
 	<div class="post-meta-info">
@@ -8,14 +8,14 @@
 			<path fill-rule="evenodd" d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path>
 		</svg>
 
-		<span class="post-author"><a href="https://lesjoiesducode.fr/author/nicolas" title="Articles par Nicolas Lecointre" rel="author">My fake author</a></span>, my fake date
+		<span class="post-author"><a href="https://lesjoiesducode.fr/author/nicolas" title="Articles par Nicolas Lecointre" rel="author">My fake author JPG</a></span>, my fake date JPG
 	</div>
 	
 	<div class="blog-post-content">
 		<p>
 			<font color="#787c7e"># En partenariat avec OpenClassrooms</font>
 			<picture>
-				<source data-srcset="https://lesjoiesducode.fr/content/048/hogwarts-legacy.webp" type="image/webp" style="width:100%;" srcset="https://lesjoiesducode.fr/content/048/hogwarts-legacy.webp"><source data-srcset="https://lesjoiesducode.fr/content/048/hogwarts-legacy.jpg" type="image/jpeg" style="width:100%;" srcset="https://lesjoiesducode.fr/content/048/hogwarts-legacy.jpg"><img class="lazy loaded" decoding="async" src="https://lesjoiesducode.fr/content/048/hogwarts-legacy.jpg" data-src="https://my-fake/img/my-fake-id.jpg" style="width:100%;" data-was-processed="true">
+				<source data-srcset="https://lesjoiesducode.fr/content/048/hogwarts-legacy.webp" type="image/webp" style="width:100%;" srcset="https://lesjoiesducode.fr/content/048/hogwarts-legacy.webp"><source data-srcset="https://lesjoiesducode.fr/content/048/hogwarts-legacy.jpg" type="image/jpeg" style="width:100%;" srcset="https://lesjoiesducode.fr/content/048/hogwarts-legacy.jpg"><img class="lazy loaded" decoding="async" src="https://lesjoiesducode.fr/content/048/hogwarts-legacy.jpg" data-src="https://my-fake/img/my-fake-id-JPG.jpg" style="width:100%;" data-was-processed="true">
 			</picture>
 		</p>
 		<p>Envie de donner un <strong>coup de boost</strong> à votre carrière ou à vos études en lien avec le développement informatique ? Il y a forcément une formation OpenClassrooms pour ça ! 😉</p><p>Vous êtes assez nombreux à m’écrire régulièrement afin de me poser des questions sur les différents cursus de formation pour développeurs, que vous soyez débutants en programmation, en réflexion sur une éventuelle reconversion professionnelle, ou même parfois déjà la tête dans les études.</p><p>En partenariat avec OpenClassrooms, c’est un honneur pour moi de pouvoir vous parler ici de <strong>l’un des acteurs principaux</strong> dans ce domaine en France.</p><p><a class="more-link" href="https://lesjoiesducode.fr/formation-developpeur-alternance-ia-cybersecurite-openclassrooms">Lire l'article →</a></p></div><div class="social-share">

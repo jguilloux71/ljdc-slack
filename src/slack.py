@@ -78,11 +78,12 @@ class Slack:
         except SlackApiError as e:
             logger.error('Unable to send GIF image to channel [%s]: %s' %
                 (self.channel, str(e.response['error'])))
-            return
+            return False
 
         logger.info('[%s] New message/img posted successfully [id=%s]' %
             (self.channel, post['id']))
 
+        return True
 
     def print_env(self):
         print (self.auth_token)
