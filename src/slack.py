@@ -85,7 +85,7 @@ class Slack:
 
         return True
 
-    def print_env(self):
+    def print_env(self):            # pragma: no cover
         print (self.auth_token)
         print (self.channel)
 #------------------------------------------------------------------------------

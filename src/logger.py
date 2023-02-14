@@ -41,7 +41,7 @@ def _initialize():
 #-------------------------------------------------------------------------------------------------------------
 try:
     os.makedirs(os.path.dirname(LJDC_LOG_FILE), exist_ok=True)
-except OSError as e:
+except OSError as e:    # pragma: no cover
     print("Unable to create directory: %s" % (str(e)), file=sys.stderr)
     # Fatal error
     sys.exit(1)

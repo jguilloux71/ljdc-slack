@@ -145,7 +145,7 @@ def get_last_posts():
         post = _get_post(article)
 
         if post['img'] is None:
-            logger.error('Unable to retrieve img for post: %s' % (post['url']))
+            logger.error('Unable to retrieve img for post: %s' % (post['url'])) # pragma: no cover
         else:
             posts.append(post)
             logger.info('Post added for treatment [id=%s]' % (post['id']))

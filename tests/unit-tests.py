@@ -75,6 +75,8 @@ from bs4 import BeautifulSoup
 class TestLjdc(unittest.TestCase):
     article_gif_data_file = full_path + '/ljdc-article-gif.data'
     article_jpg_data_file = full_path + '/ljdc-article-jpg.data'
+    article_no_img_data_file = full_path + '/ljdc-article-no-img.data'
+
     fake_id  = 'fake-id'
     fake_url = 'https://lesjoiesducode.fr/content/048/%s.gif' % (fake_id)
     fake_content_ids_file = """id-number-1
@@ -115,9 +117,24 @@ class TestLjdc(unittest.TestCase):
         soup = BeautifulSoup(self.article_jpg_data, "html.parser")
         self.article_jpg = soup.find("article", class_="blog-post")
 
+        # Special data for NO-IMG article
+        with open(self.article_no_img_data_file, "r") as f:
+            self.article_no_img_data = f.read()
+
+        soup = BeautifulSoup(self.article_no_img_data, "html.parser")
+        self.article_no_img = soup.find("article", class_="blog-post")
+
     def test_get_post_id(self):
         id_post = ljdc._get_post_id(self.fake_url)
         self.assertEqual(id_post, self.fake_id)
+
+    def test_get_post_no_img(self):
+        post = ljdc._get_post(self.article_no_img)
+        self.assertEqual(post['url'], 'https://my-fake-NO-IMG.url')
+        self.assertEqual(post['title'], 'My fake title NO-IMG')
+        self.assertEqual(post['author-date'], 'My fake author NO-IMG, my fake date NO-IMG')
+        self.assertIsNone(post['img'])
+        self.assertIsNone(post['id'])
 
     def test_get_post_gif(self):
         post = ljdc._get_post(self.article_gif)
@@ -136,7 +153,17 @@ class TestLjdc(unittest.TestCase):
         self.assertEqual(post['id'], 'my-fake-id-JPG')
 
     @patch('requests.get')
-    def test_get_last_posts(self, m):
+    def test_get_last_posts_nok(self, m):
+        # Mock GET request with fake data
+        m.return_value.ok = False
+        m.side_effect=requests.exceptions.RequestException('Network error')
+        with self.assertRaises(SystemExit) as context:
+            last_posts = ljdc.get_last_posts()
+        self.assertEqual('1', str(context.exception))
+
+
+    @patch('requests.get')
+    def test_get_last_posts_ok(self, m):
         # Mock GET request with fake data
         m.return_value.ok = True
         m.return_value.content = self.article_gif_data+self.article_jpg_data
