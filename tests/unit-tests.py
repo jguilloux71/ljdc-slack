@@ -10,15 +10,6 @@ import requests_mock
 import sys
 import unittest
 
-# let's use the pprint module for readability
-from pprint import pprint
-from slack_sdk import web
-from slack_sdk.errors import SlackApiError
-
-
-# import inspect module
-import inspect
-
 from pathlib import Path
 from unittest import mock
 from unittest.mock import mock_open, patch
@@ -102,27 +93,16 @@ class TestLjdc(unittest.TestCase):
         mock.call('last-id-3\n')
     ]
 
+    def _soup_data(self, data_file):
+        with open(data_file, "r") as f:
+            f_data = f.read()
+        return (BeautifulSoup(f_data, "html.parser")\
+                .find("article", class_="blog-post"), f_data)
+
     def setUp(self):
-        # Special data for GIF article
-        with open(self.article_gif_data_file, "r") as f:
-            self.article_gif_data = f.read()
-
-        soup = BeautifulSoup(self.article_gif_data, "html.parser")
-        self.article_gif = soup.find("article", class_="blog-post")
-
-        # Special data for JPG article
-        with open(self.article_jpg_data_file, "r") as f:
-            self.article_jpg_data = f.read()
-
-        soup = BeautifulSoup(self.article_jpg_data, "html.parser")
-        self.article_jpg = soup.find("article", class_="blog-post")
-
-        # Special data for NO-IMG article
-        with open(self.article_no_img_data_file, "r") as f:
-            self.article_no_img_data = f.read()
-
-        soup = BeautifulSoup(self.article_no_img_data, "html.parser")
-        self.article_no_img = soup.find("article", class_="blog-post")
+        (self.article_gif,    self.article_gif_data)    = self._soup_data(self.article_gif_data_file)
+        (self.article_jpg,    self.article_jpg_data)    = self._soup_data(self.article_jpg_data_file)
+        (self.article_no_img, self.article_no_img_data) = self._soup_data(self.article_no_img_data_file)
 
     def test_get_post_id(self):
         id_post = ljdc._get_post_id(self.fake_url)
@@ -166,7 +146,7 @@ class TestLjdc(unittest.TestCase):
     def test_get_last_posts_ok(self, m):
         # Mock GET request with fake data
         m.return_value.ok = True
-        m.return_value.content = self.article_gif_data+self.article_jpg_data
+        m.return_value.content = self.article_gif_data + self.article_jpg_data
         last_posts = ljdc.get_last_posts()
         self.assertEqual(len(last_posts), 2)
         self.assertEqual(last_posts[0]['img'], 'https://my-fake/img/my-fake-id-GIF.gif')
@@ -211,6 +191,7 @@ class TestLjdc(unittest.TestCase):
 
 #------------------------------------------------------------------------------
 import slack
+from slack_sdk import web
 from slack_sdk.errors import SlackApiError
 
 class TestSlack(unittest.TestCase):
