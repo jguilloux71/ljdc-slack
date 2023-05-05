@@ -26,9 +26,10 @@ import ljdc
 from bs4 import BeautifulSoup
 
 class TestLjdc(unittest.TestCase):
-    article_gif_data_file = full_path + '/ljdc-article-gif.data'
-    article_jpg_data_file = full_path + '/ljdc-article-jpg.data'
-    article_no_img_data_file = full_path + '/ljdc-article-no-img.data'
+    article_gif_data_file          = full_path + '/ljdc-article-gif.data'
+    article_jpg_data_file          = full_path + '/ljdc-article-jpg.data'
+    article_jpg_with_tag_data_file = full_path + '/ljdc-article-jpg-with-tag.data'
+    article_no_img_data_file       = full_path + '/ljdc-article-no-img.data'
 
     fake_id  = 'fake-id'
     fake_url = 'https://lesjoiesducode.fr/content/048/%s.gif' % (fake_id)
@@ -62,9 +63,10 @@ class TestLjdc(unittest.TestCase):
                 .find("article", class_="blog-post"), f_data)
 
     def setUp(self):
-        (self.article_gif,    self.article_gif_data)    = self._soup_data(self.article_gif_data_file)
-        (self.article_jpg,    self.article_jpg_data)    = self._soup_data(self.article_jpg_data_file)
-        (self.article_no_img, self.article_no_img_data) = self._soup_data(self.article_no_img_data_file)
+        (self.article_gif,          self.article_gif_data)    = self._soup_data(self.article_gif_data_file)
+        (self.article_jpg,          self.article_jpg_data)    = self._soup_data(self.article_jpg_data_file)
+        (self.article_jpg_with_tag, self.article_jpg_data)    = self._soup_data(self.article_jpg_with_tag_data_file)
+        (self.article_no_img,       self.article_no_img_data) = self._soup_data(self.article_no_img_data_file)
 
     def test_get_post_id(self):
         id_post = ljdc._get_post_id(self.fake_url)
@@ -88,6 +90,14 @@ class TestLjdc(unittest.TestCase):
 
     def test_get_post_jpg(self):
         post = ljdc._get_post(self.article_jpg)
+        self.assertEqual(post['url'], 'https://my-fake-JPG.url')
+        self.assertEqual(post['title'], 'My fake title JPG')
+        self.assertEqual(post['author-date'], 'My fake author JPG, my fake date JPG')
+        self.assertEqual(post['img'], 'https://my-fake/img/my-fake-id-JPG.jpg')
+        self.assertEqual(post['id'], 'my-fake-id-JPG')
+
+    def test_get_post_jpg_with_tag(self):
+        post = ljdc._get_post(self.article_jpg_with_tag)
         self.assertEqual(post['url'], 'https://my-fake-JPG.url')
         self.assertEqual(post['title'], 'My fake title JPG')
         self.assertEqual(post['author-date'], 'My fake author JPG, my fake date JPG')

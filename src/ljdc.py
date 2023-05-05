@@ -117,6 +117,11 @@ def _get_post(entry):
     post['title']       = entry.find('h1',   class_='index-blog-post-title').find('a').get_text()
     post['author-date'] = entry.find('div',  class_='post-meta-info').get_text().strip()
 
+    # Management of use-case where there is a 'tag' after the date
+    # See the data test file 'test/ljdc-article-jpg-with-tag.data' for more details
+    if '/' in post['author-date']:
+        post['author-date'] = ''.join(post['author-date'].splitlines()).split('/', 1)[0]
+
     (post['img'], post['id']) = _get_post_img(entry)
 
     _display_post_info(post)
